@@ -142,24 +142,7 @@ export function ChatSidebar({ onNewChat, activeConversationId }: ChatSidebarProp
           Workspace
         </div>
         {NAV_ITEMS.slice(1).map((item) => {
-          // Knowledge route doesn't exist yet
-          if (item.href === "/knowledge") {
-            return (
-              <div
-                key={item.name}
-                className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-100 opacity-60 cursor-not-allowed"
-              >
-                <div className="flex items-center gap-3">
-                  <item.icon className="w-4 h-4" />
-                  {item.name}
-                </div>
-                <span className="text-[10px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded uppercase font-bold tracking-widest">
-                  Soon
-                </span>
-              </div>
-            );
-          }
-          
+
           const isActive = pathname.startsWith(item.href);
           
           return (

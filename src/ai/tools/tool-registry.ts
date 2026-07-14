@@ -3,12 +3,14 @@ import { getUserContextTool } from "./get-user-context";
 import { listGoalsTasksTool } from "./list-goals-tasks";
 import { draftGoalPlanTool } from "./draft-goal-plan";
 import { createInternalTasksTool } from "./create-internal-tasks";
+import { SearchKnowledgeTool } from "./search-knowledge";
 
 export const jerryTools: JerryTool[] = [
   getUserContextTool,
   listGoalsTasksTool,
   draftGoalPlanTool,
   createInternalTasksTool,
+  SearchKnowledgeTool,
 ];
 
 export const getToolDefinitions = () => jerryTools.map(t => t.definition);
