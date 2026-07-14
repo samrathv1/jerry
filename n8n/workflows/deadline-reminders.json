@@ -1,0 +1,123 @@
+{
+  "name": "Jerry - Deadline Reminders",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 * * * *"
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [ 100, 300 ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const timestamp = Math.floor(Date.now() / 1000).toString();\nconst idempotencyKey = $execution?.id || 'manual-' + Date.now();\n\nconst rawBody = JSON.stringify({\n  automationType: 'deadline_reminders',\n  payload: {}\n});\n\nconst method = 'POST';\nconst path = '/api/webhooks/n8n';\nconst canonicalString = `${method}\\n${path}\\n${timestamp}\\n${idempotencyKey}\\n${rawBody}`;\n\nreturn {\n  json: {\n    timestamp,\n    idempotencyKey,\n    rawBody,\n    canonicalString\n  }\n};"
+      },
+      "name": "Prepare Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [ 300, 300 ]
+    },
+    {
+      "parameters": {
+        "action": "hmac",
+        "type": "SHA256",
+        "value": "={{$json.canonicalString}}",
+        "dataPropertyName": "signature",
+        "encoding": "hex"
+      },
+      "name": "Crypto HMAC",
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [ 500, 300 ],
+      "credentials": {
+        "cryptoApi": {
+          "id": "[N8N_CREDENTIAL_ID]",
+          "name": "Jerry Webhook Secret"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.JERRY_BASE_URL || 'http://host.docker.internal:3000'}}/api/webhooks/n8n",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-jerry-credential-id",
+              "value": "={{$env.JERRY_CREDENTIAL_ID || '[AUTOMATION_CREDENTIAL_ID]'}}"
+            },
+            {
+              "name": "x-n8n-timestamp",
+              "value": "={{$json.timestamp}}"
+            },
+            {
+              "name": "x-n8n-idempotency-key",
+              "value": "={{$json.idempotencyKey}}"
+            },
+            {
+              "name": "x-n8n-signature",
+              "value": "={{$json.signature}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "string",
+        "bodyString": "={{$json.rawBody}}",
+        "options": {}
+      },
+      "name": "Trigger Jerry",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [ 700, 300 ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Prepare Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Payload": {
+      "main": [
+        [
+          {
+            "node": "Crypto HMAC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto HMAC": {
+      "main": [
+        [
+          {
+            "node": "Trigger Jerry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
