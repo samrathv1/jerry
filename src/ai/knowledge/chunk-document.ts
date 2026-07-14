@@ -6,14 +6,13 @@ export interface Chunk {
   index: number;
   content: string;
   tokenCount: number;
-  ...(pageNumber ? { pageNumber } : {})?: number;
+  pageNumber?: number;
   sectionTitle?: string;
   locationLabel?: string;
 }
 
 export function chunkDocument(
-  text: string,
-  _model = KnowledgeConfig.embedding.model
+  text: string
 ): Chunk[] {
   if (!text.trim()) {
     return [];
@@ -42,17 +41,17 @@ export function chunkDocument(
       
       if (chunkText) {
         // Attempt to extract page number if we injected it during PDF parse
-        let ...(pageNumber ? { pageNumber } : {}): number | undefined = undefined;
+        let pageNumber: number | undefined = undefined;
         const pageMatch = chunkText.match(/--- Page (\d+) ---/);
         if (pageMatch) {
-          ...(pageNumber ? { pageNumber } : {}) = parseInt(pageMatch[1], 10);
+          pageNumber = parseInt(pageMatch[1] as string, 10);
         }
 
         chunks.push({
           index: chunkIdx,
           content: chunkText,
           tokenCount: chunkTokens.length,
-          ...(pageNumber ? { pageNumber } : {}),
+          ...(pageNumber !== undefined ? { pageNumber: pageNumber as number } : {}),
           // Extract a naive section title (first sentence or line)
           locationLabel: `Chunk ${chunkIdx + 1}`
         });

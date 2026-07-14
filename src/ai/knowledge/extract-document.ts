@@ -85,7 +85,7 @@ export async function extractDocumentContent(
 
   return {
     text: extractedText,
-    ...(pageCount ? { pageCount } : {}),
+    ...(pageCount !== undefined ? { pageCount: pageCount as number } : {}),
     characterCount: extractedText.length
   };
 }

@@ -47,8 +47,8 @@ export async function POST(
     // Process it synchronously for simplicity, as we don't have a background queue runner setup
     await processDocument(documentId, user.id);
     return NextResponse.json({ success: true, status: 'ready' });
-  } catch (e) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
+  } catch (e: any) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
     // processDocument already updates the DB on failure
-    return NextResponse.json({ error: 'Processing failed', details: err.message }, { status: 500 });
+    return NextResponse.json({ error: 'Processing failed', details: e.message }, { status: 500 });
   }
 }

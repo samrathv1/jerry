@@ -60,7 +60,7 @@ export default function KnowledgePage() {
       // Refresh list
       await fetchDocuments();
     } catch (e) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
-      setError(err.message);
+      setError((e as Error).message);
     } finally {
       setUploading(false);
     }

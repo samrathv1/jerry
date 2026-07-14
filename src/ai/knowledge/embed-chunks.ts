@@ -21,8 +21,7 @@ export async function embedChunks(chunks: string[]): Promise<EmbeddedChunk[]> {
     
     let attempt = 0;
     let success = false;
-    let lastError: Error | null = null;
-    
+        
     while (attempt < maxRetries && !success) {
       try {
         const response = await openai.embeddings.create({
@@ -46,7 +45,7 @@ export async function embedChunks(chunks: string[]): Promise<EmbeddedChunk[]> {
           throw error;
         }
         attempt++;
-        lastError = error;
+        
         // Basic backoff
         if (attempt < maxRetries) {
           await new Promise(resolve => setTimeout(resolve, 1000 * attempt));

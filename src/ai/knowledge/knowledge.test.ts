@@ -120,8 +120,9 @@ describe('Knowledge Vault - Server Logic', () => {
       const text = 'This is a test document that should be chunked properly based on tokens.';
       const chunks = chunkDocument(text);
       expect(chunks.length).toBeGreaterThan(0);
-      expect(chunks[0].index).toBe(0);
-      expect(chunks[0].content).toBeTruthy();
+      expect(chunks.length).toBeGreaterThan(0);
+      expect(chunks[0]!.index).toBe(0);
+      expect(chunks[0]!.content).toBeTruthy();
     });
 
     it('removes empty chunks', () => {
@@ -145,7 +146,8 @@ describe('Knowledge Vault - Server Logic', () => {
 
       const res = await embedChunks(['test chunk']);
       expect(res.length).toBe(1);
-      expect(res[0].embedding.length).toBe(1536);
+      expect(res.length).toBe(1);
+      expect(res[0]!.embedding.length).toBe(1536);
     });
 
     it('throws on dimension mismatch', async () => {
@@ -186,8 +188,9 @@ describe('Knowledge Vault - Server Logic', () => {
 
       const res = await searchKnowledge('user-1', { query: 'test', limit: 5 });
       expect(res.results.length).toBe(1);
-      expect(res.results[0].excerpt).toContain('---START OF UNTRUSTED EXCERPT---');
-      expect(res.results[0].excerpt).toContain('test chunk');
+      expect(res.results.length).toBe(1);
+      expect(res.results[0]!.excerpt).toContain('---START OF UNTRUSTED EXCERPT---');
+      expect(res.results[0]!.excerpt).toContain('test chunk');
     });
     
     it('returns zero results honestly', async () => {
@@ -195,7 +198,7 @@ describe('Knowledge Vault - Server Logic', () => {
         data: [{ embedding: new Array(1536).fill(0.1) }],
       } as any);
       const { createClient } = await import('@/lib/supabase/server');
-      vi.mocked(await createClient()).rpc.mockResolvedValueOnce({ data: [] as any[] });
+      vi.mocked(await createClient()).rpc.mockResolvedValueOnce({ data: [] as any[] } as any);
 
       const res = await searchKnowledge('user-1', { query: 'test', limit: 5 });
       expect(res.results.length).toBe(0);

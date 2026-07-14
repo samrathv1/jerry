@@ -24,7 +24,7 @@ export async function searchKnowledge(
     dimensions
   });
   
-  const queryEmbedding = embedResponse.data[0].embedding;
+  const queryEmbedding = embedResponse.data[0]!.embedding;
   if (queryEmbedding.length !== dimensions) {
     throw new Error('Query embedding dimension mismatch');
   }

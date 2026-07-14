@@ -9,7 +9,7 @@ export async function processDocument(documentId: string, userId: string): Promi
 
   try {
     // 1. Fetch document and ensure it's in a valid state to process
-    const { data: doc, e: docError } = await supabase
+    const { data: doc, error: docError } = await supabase
       .from('knowledge_documents')
       .select('*')
       .eq('id', documentId)
@@ -30,13 +30,13 @@ export async function processDocument(documentId: string, userId: string): Promi
       .update({
         status: 'processing',
         processing_started_at: new Date().toISOString(),
-        safe_e_message: null
+        safe_error_messagerror: null
       })
       .eq('id', documentId)
       .eq('user_id', userId);
 
     // 3. Download the file from storage
-    const { data: fileData, e: downloadError } = await supabase.storage
+    const { data: fileData, error: downloadError } = await supabase.storage
       .from(doc.storage_bucket)
       .download(doc.storage_path);
 
@@ -64,9 +64,9 @@ export async function processDocument(documentId: string, userId: string): Promi
       content: c.content,
       token_count: c.tokenCount,
       page_number: c.pageNumber,
-      section_title: c.sectionTitle,
+      section_titlerror: c.sectionTitle,
       location_label: c.locationLabel,
-      embedding: embeddedChunks[i].embedding
+      embedding: embeddedChunks[i]?.embedding
     }));
 
     // Clear any existing chunks (retry scenario)
@@ -76,11 +76,12 @@ export async function processDocument(documentId: string, userId: string): Promi
     const BATCH_SIZE = 100;
     for (let i = 0; i < chunksToInsert.length; i += BATCH_SIZE) {
       const batch = chunksToInsert.slice(i, i + BATCH_SIZE);
-      const { e: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from('knowledge_chunks')
         .insert(batch);
       
       if (insertError) {
+        console.error('Failed to process document:', insertError);
         throw new Error('Failed to save document chunks.');
       }
     }
@@ -98,14 +99,14 @@ export async function processDocument(documentId: string, userId: string): Promi
       .eq('id', documentId)
       .eq('user_id', userId);
 
-  } catch (e) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
+  } catch (e: any) {
     // 9. On failure, mark as failed
-    const safeErrorMessage = e.message || 'An unknown e occurred during processing.';
+    const safeErrorMessage = e.message || 'An unknown error occurred during processing.';
     await supabase
       .from('knowledge_documents')
       .update({
         status: 'failed',
-        safe_e_message: safeErrorMessage,
+        safe_error_messagerror: safeErrorMessage,
         processing_completed_at: new Date().toISOString()
       })
       .eq('id', documentId)
