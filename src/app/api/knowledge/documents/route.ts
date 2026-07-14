@@ -62,6 +62,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (dbError || !doc) {
+      console.error('Failed to create document record', dbError);
       return NextResponse.json({ error: 'Failed to create document record' }, { status: 500 });
     }
 
