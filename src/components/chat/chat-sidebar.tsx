@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { MessageSquare, Target, CheckSquare, BookOpen, BrainCircuit, Activity, Bot, Plus, Trash2, Loader2, LogOut } from "lucide-react";
+import { MessageSquare, Target, CheckSquare, BookOpen, BrainCircuit, Activity, Bot, Plus, Trash2, Loader2, LogOut, PlaySquare } from "lucide-react";
 import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
 
 interface ChatSidebarProps {
   onNewChat: () => void;
@@ -19,18 +19,20 @@ interface Conversation {
 }
 
 const NAV_ITEMS = [
-  { name: "Chat", icon: MessageSquare, active: true },
-  { name: "Goals", icon: Target },
-  { name: "Tasks", icon: CheckSquare },
-  { name: "Knowledge", icon: BookOpen },
-  { name: "Memories", icon: BrainCircuit },
-  { name: "Activity", icon: Activity },
+  { name: "Chat", icon: MessageSquare, href: "/chat" },
+  { name: "Goals", icon: Target, href: "/goals" },
+  { name: "Tasks", icon: CheckSquare, href: "/tasks" },
+  { name: "Knowledge", icon: BookOpen, href: "/knowledge" },
+  { name: "Memories", icon: BrainCircuit, href: "/memories" },
+  { name: "Activity", icon: Activity, href: "/activity" },
+  { name: "Automations", icon: PlaySquare, href: "/automations" },
 ];
 
 export function ChatSidebar({ onNewChat, activeConversationId }: ChatSidebarProps) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
 
   const fetchConversations = useCallback(async () => {
     try {
@@ -139,20 +141,44 @@ export function ChatSidebar({ onNewChat, activeConversationId }: ChatSidebarProp
         <div className="mt-8 mb-3 px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
           Workspace
         </div>
-        {NAV_ITEMS.slice(1).map((item) => (
-          <div
-            key={item.name}
-            className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-100 opacity-60 cursor-not-allowed"
-          >
-            <div className="flex items-center gap-3">
-              <item.icon className="w-4 h-4" />
-              {item.name}
-            </div>
-            <span className="text-[10px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded uppercase font-bold tracking-widest">
-              Soon
-            </span>
-          </div>
-        ))}
+        {NAV_ITEMS.slice(1).map((item) => {
+          // Knowledge route doesn't exist yet
+          if (item.href === "/knowledge") {
+            return (
+              <div
+                key={item.name}
+                className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-100 opacity-60 cursor-not-allowed"
+              >
+                <div className="flex items-center gap-3">
+                  <item.icon className="w-4 h-4" />
+                  {item.name}
+                </div>
+                <span className="text-[10px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded uppercase font-bold tracking-widest">
+                  Soon
+                </span>
+              </div>
+            );
+          }
+          
+          const isActive = pathname.startsWith(item.href);
+          
+          return (
+            <Link
+              key={item.name}
+              href={item.href}
+              className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                isActive
+                  ? "bg-white text-amber-700 shadow-sm border border-gray-200/50" 
+                  : "text-gray-600 hover:bg-gray-100 border border-transparent"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <item.icon className="w-4 h-4" />
+                {item.name}
+              </div>
+            </Link>
+          );
+        })}
       </nav>
 
       {/* Footer Note */}

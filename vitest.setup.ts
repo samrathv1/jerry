@@ -13,6 +13,7 @@ vi.mock("next/navigation", () => ({
     prefetch: vi.fn(),
     back: vi.fn(),
   }),
+  usePathname: () => "/chat",
 }));
 
 // Mock ResizeObserver which is needed by some layout operations
