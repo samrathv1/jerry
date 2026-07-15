@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
-import { Target, CheckCircle2, Circle, ArrowLeft } from "lucide-react";
+import { Target, CheckCircle2, Circle, ArrowLeft, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Goal } from "@/domain/schemas/goals";
 import { Task } from "@/domain/schemas/tasks";
+import { WorkspaceLayout } from "@/components/layout/workspace-layout";
 
 export default function GoalDetailPage({ params }: { params: Promise<{ goalId: string }> }) {
   const { goalId } = use(params);
+  const router = useRouter();
   const [goal, setGoal] = useState<Goal | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -44,15 +47,43 @@ export default function GoalDetailPage({ params }: { params: Promise<{ goalId: s
     });
   };
 
-  if (isLoading) return <div className="p-8">Loading goal...</div>;
-  if (!goal) return <div className="p-8 text-red-500">Goal not found.</div>;
+  const deleteGoal = async () => {
+    if (!goal) return;
+    if (!confirm("Are you sure you want to delete this goal?")) return;
+
+    const res = await fetch(`/api/goals/${goal.id}`, {
+      method: "DELETE"
+    });
+
+    if (res.ok) {
+      router.push("/goals");
+    } else {
+      alert("Failed to delete goal.");
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <WorkspaceLayout>
+        <div className="p-8">Loading goal...</div>
+      </WorkspaceLayout>
+    );
+  }
+  if (!goal) {
+    return (
+      <WorkspaceLayout>
+        <div className="p-8 text-red-500">Goal not found.</div>
+      </WorkspaceLayout>
+    );
+  }
 
   const completedTasks = tasks.filter(t => t.status === "completed").length;
   const totalTasks = tasks.length;
   const computedProgress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : goal.progress;
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <WorkspaceLayout>
+      <div className="p-8 max-w-4xl mx-auto">
       <Link href="/goals" className="inline-flex items-center text-sm text-slate-500 hover:text-slate-800 mb-6 transition-colors">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to Goals
       </Link>
@@ -80,6 +111,9 @@ export default function GoalDetailPage({ params }: { params: Promise<{ goalId: s
                 <CheckCircle2 className="w-4 h-4" /> Complete
               </button>
             )}
+            <button onClick={deleteGoal} className="text-sm bg-red-50 text-red-700 border border-red-200 px-3 py-1.5 rounded-md hover:bg-red-100 font-medium transition-colors flex items-center gap-2">
+              <Trash2 className="w-4 h-4" /> Delete
+            </button>
           </div>
         </div>
 
@@ -135,5 +169,6 @@ export default function GoalDetailPage({ params }: { params: Promise<{ goalId: s
         </div>
       )}
     </div>
+    </WorkspaceLayout>
   );
 }

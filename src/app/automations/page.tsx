@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 import { AutomationDefinition } from '@/domain/automations/types';
+import { WorkspaceLayout } from '@/components/layout/workspace-layout';
 
 export default function AutomationsPage() {
     const [automations, setAutomations] = useState<AutomationDefinition[]>([]);
@@ -56,11 +57,16 @@ export default function AutomationsPage() {
     };
 
     if (loading) {
-        return <div className="p-8 text-neutral-400">Loading automations...</div>;
+        return (
+            <WorkspaceLayout>
+                <div className="p-8 text-neutral-400">Loading automations...</div>
+            </WorkspaceLayout>
+        );
     }
 
     return (
-        <div className="max-w-4xl mx-auto p-8">
+        <WorkspaceLayout>
+            <div className="max-w-4xl mx-auto p-8">
             <h1 className="text-3xl font-bold mb-2">Automations</h1>
             <p className="text-neutral-400 mb-8">Manage proactive workflows and scheduled tasks.</p>
 
@@ -95,5 +101,6 @@ export default function AutomationsPage() {
                 </div>
             )}
         </div>
+      </WorkspaceLayout>
     );
 }

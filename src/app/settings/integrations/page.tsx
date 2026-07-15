@@ -1,11 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
+import { WorkspaceLayout } from "@/components/layout/workspace-layout";
 
 export default async function IntegrationsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    return <div className="p-8 text-center text-zinc-400">Please sign in to view integrations.</div>;
+    return (
+      <WorkspaceLayout>
+        <div className="p-8 text-center text-zinc-400">Please sign in to view integrations.</div>
+      </WorkspaceLayout>
+    );
   }
 
   const { data: accounts } = await supabase
@@ -17,7 +22,8 @@ export default async function IntegrationsPage() {
   const googleAccount = accounts?.find(a => a.provider === "google");
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
+    <WorkspaceLayout>
+      <div className="max-w-4xl mx-auto p-6 space-y-8">
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight">Integrations</h1>
         <p className="text-zinc-400">Manage your connected third-party accounts and permissions.</p>
@@ -65,5 +71,6 @@ export default async function IntegrationsPage() {
         </div>
       </div>
     </div>
+  </WorkspaceLayout>
   );
 }

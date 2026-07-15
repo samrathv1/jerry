@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { CheckCircle2, Circle, AlertCircle, Calendar } from "lucide-react";
 import { Task } from "@/domain/schemas/tasks";
+import { WorkspaceLayout } from "@/components/layout/workspace-layout";
 
 type FilterType = "today" | "upcoming" | "overdue" | "high_priority" | "blocked" | "completed" | "all";
 
@@ -58,11 +59,16 @@ export default function TasksPage() {
   const filteredTasks = getFilteredTasks();
 
   if (isLoading) {
-    return <div className="p-8 text-slate-500">Loading tasks...</div>;
+    return (
+      <WorkspaceLayout>
+        <div className="p-8 text-slate-500">Loading tasks...</div>
+      </WorkspaceLayout>
+    );
   }
 
   return (
-    <div className="p-8 max-w-4xl mx-auto flex gap-8">
+    <WorkspaceLayout>
+      <div className="p-8 max-w-4xl mx-auto flex gap-8">
       {/* Sidebar Filters */}
       <div className="w-64 shrink-0">
         <h2 className="text-xl font-semibold text-charcoal-800 mb-6">Tasks</h2>
@@ -135,5 +141,6 @@ export default function TasksPage() {
         )}
       </div>
     </div>
+  </WorkspaceLayout>
   );
 }

@@ -1,13 +1,18 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { WorkspaceLayout } from "@/components/layout/workspace-layout";
 
 export default async function ExecutionDetailPage({ params }: { params: Promise<{ executionId: string }> }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    return <div className="p-8 text-center text-zinc-400">Please sign in to view activity details.</div>;
+    return (
+      <WorkspaceLayout>
+        <div className="p-8 text-center text-zinc-400">Please sign in to view activity details.</div>
+      </WorkspaceLayout>
+    );
   }
 
   const { executionId } = await params;
@@ -35,7 +40,8 @@ export default async function ExecutionDetailPage({ params }: { params: Promise<
   const proposal = exec.external_action_proposals as any;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-8">
+    <WorkspaceLayout>
+      <div className="max-w-3xl mx-auto p-6 space-y-8">
       <div>
         <Link href="/activity" className="text-sm text-zinc-400 hover:text-zinc-300 mb-4 inline-block">
           &larr; Back to Activity
@@ -97,5 +103,6 @@ export default async function ExecutionDetailPage({ params }: { params: Promise<
         </section>
       </div>
     </div>
+  </WorkspaceLayout>
   );
 }

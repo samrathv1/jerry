@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Upload, FileText, Trash2, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { KnowledgeDocument } from '@/ai/knowledge/types';
+import { WorkspaceLayout } from '@/components/layout/workspace-layout';
 
 export default function KnowledgePage() {
   const [documents, setDocuments] = useState<KnowledgeDocument[]>([]);
@@ -73,7 +74,10 @@ export default function KnowledgePage() {
     setDocuments(docs => docs.filter(d => d.id !== id));
     
     try {
-      await fetch(`/api/knowledge/documents/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/knowledge/documents/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        throw new Error('Deletion failed');
+      }
     } catch (e) /* eslint-disable-line @typescript-eslint/no-unused-vars */ {
       // Revert if error
       fetchDocuments();
@@ -90,7 +94,8 @@ export default function KnowledgePage() {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <WorkspaceLayout>
+      <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Knowledge Vault</h1>
 
       <div className="mb-8">
@@ -145,5 +150,6 @@ export default function KnowledgePage() {
         )}
       </div>
     </div>
+  </WorkspaceLayout>
   );
 }

@@ -1,11 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
+import { WorkspaceLayout } from "@/components/layout/workspace-layout";
 
 export default async function MemoriesPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    return <div className="p-8 text-center text-zinc-400">Please sign in to view memories.</div>;
+    return (
+      <WorkspaceLayout>
+        <div className="p-8 text-center text-zinc-400">Please sign in to view memories.</div>
+      </WorkspaceLayout>
+    );
   }
 
   const { data: memories } = await supabase
@@ -15,7 +20,8 @@ export default async function MemoriesPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
+    <WorkspaceLayout>
+      <div className="max-w-4xl mx-auto p-6 space-y-8">
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight">Memories</h1>
         <p className="text-zinc-400">View and manage your core memories.</p>
@@ -45,5 +51,6 @@ export default async function MemoriesPage() {
         )}
       </div>
     </div>
+  </WorkspaceLayout>
   );
 }

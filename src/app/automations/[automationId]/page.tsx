@@ -5,6 +5,7 @@ import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 import { AutomationDefinition, AutomationRun } from '@/domain/automations/types';
+import { WorkspaceLayout } from '@/components/layout/workspace-layout';
 
 export default function AutomationDetailPage({ params }: { params: Promise<{ automationId: string }> }) {
     const { automationId } = use(params);
@@ -73,11 +74,24 @@ export default function AutomationDetailPage({ params }: { params: Promise<{ aut
         }
     };
 
-    if (loading) return <div className="p-8 text-neutral-400">Loading details...</div>;
-    if (!automation) return <div className="p-8 text-red-500">Automation not found.</div>;
+    if (loading) {
+        return (
+            <WorkspaceLayout>
+                <div className="p-8 text-neutral-400">Loading details...</div>
+            </WorkspaceLayout>
+        );
+    }
+    if (!automation) {
+        return (
+            <WorkspaceLayout>
+                <div className="p-8 text-red-500">Automation not found.</div>
+            </WorkspaceLayout>
+        );
+    }
 
     return (
-        <div className="max-w-4xl mx-auto p-8">
+        <WorkspaceLayout>
+            <div className="max-w-4xl mx-auto p-8">
             <button onClick={() => router.push('/automations')} className="text-sm text-neutral-400 hover:text-white mb-6">
                 &larr; Back to Automations
             </button>
@@ -161,5 +175,6 @@ export default function AutomationDetailPage({ params }: { params: Promise<{ aut
                 </div>
             )}
         </div>
+      </WorkspaceLayout>
     );
 }

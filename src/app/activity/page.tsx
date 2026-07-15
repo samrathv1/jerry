@@ -1,12 +1,17 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
+import { WorkspaceLayout } from "@/components/layout/workspace-layout";
 
 export default async function ActivityPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    return <div className="p-8 text-center text-zinc-400">Please sign in to view activity.</div>;
+    return (
+      <WorkspaceLayout>
+        <div className="p-8 text-center text-zinc-400">Please sign in to view activity.</div>
+      </WorkspaceLayout>
+    );
   }
 
   const { data: executions } = await supabase
@@ -25,7 +30,8 @@ export default async function ActivityPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
+    <WorkspaceLayout>
+      <div className="max-w-4xl mx-auto p-6 space-y-8">
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight">Activity</h1>
         <p className="text-zinc-400">View history of external actions executed on your behalf.</p>
@@ -70,5 +76,6 @@ export default async function ActivityPage() {
         )}
       </div>
     </div>
+  </WorkspaceLayout>
   );
 }

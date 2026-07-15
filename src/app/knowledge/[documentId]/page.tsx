@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { KnowledgeDocument } from '@/ai/knowledge/types';
 import { ChevronLeft, Trash2, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
+import { WorkspaceLayout } from '@/components/layout/workspace-layout';
 
 export default function DocumentPage({ params }: { params: Promise<{ documentId: string }> }) {
   const resolvedParams = use(params);
@@ -54,11 +55,24 @@ export default function DocumentPage({ params }: { params: Promise<{ documentId:
     }
   };
 
-  if (loading) return <div className="p-6">Loading...</div>;
-  if (error || !doc) return <div className="p-6 text-red-500">{error}</div>;
+  if (loading) {
+    return (
+      <WorkspaceLayout>
+        <div className="p-6">Loading...</div>
+      </WorkspaceLayout>
+    );
+  }
+  if (error || !doc) {
+    return (
+      <WorkspaceLayout>
+        <div className="p-6 text-red-500">{error}</div>
+      </WorkspaceLayout>
+    );
+  }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <WorkspaceLayout>
+      <div className="p-6 max-w-4xl mx-auto">
       <Link href="/knowledge" className="flex items-center text-sm text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 mb-6 w-fit">
         <ChevronLeft className="w-4 h-4 mr-1" />
         Back to Knowledge Vault
@@ -153,5 +167,6 @@ export default function DocumentPage({ params }: { params: Promise<{ documentId:
         </div>
       </div>
     </div>
+  </WorkspaceLayout>
   );
 }
